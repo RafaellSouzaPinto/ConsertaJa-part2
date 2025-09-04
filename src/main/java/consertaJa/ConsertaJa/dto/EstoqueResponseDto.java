@@ -24,4 +24,10 @@ public record EstoqueResponseDto(
                         .collect(Collectors.toList())
         );
     }
+
+    public int getQuantidadeTotal() {
+        return ferramentas.stream()
+                .mapToInt(f -> f.quantidade())
+                .sum();
+    }
 }

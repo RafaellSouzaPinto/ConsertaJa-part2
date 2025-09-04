@@ -13,7 +13,9 @@ public record FerramentaResponseDto(
         double preco,
         int quantidade,
         Long fornecedorId,
-        Long estoqueId
+        Long estoqueId,
+        String fornecedorNome,
+        String estoqueLocal
 ) {
     public FerramentaResponseDto(Ferramenta f) {
         this(
@@ -25,7 +27,9 @@ public record FerramentaResponseDto(
                 f.getPreco(),
                 f.getQuantidade(),
                 f.getFornecedor() != null ? f.getFornecedor().getId() : null,
-                f.getEstoque() != null ? f.getEstoque().getId() : null
+                f.getEstoque() != null ? f.getEstoque().getId() : null,
+                f.getFornecedor() != null ? f.getFornecedor().getNome() : null,
+                f.getEstoque() != null ? f.getEstoque().getLocalArmazenamento() : null
         );
     }
 }

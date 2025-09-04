@@ -84,32 +84,45 @@ public class FerramentaService {
     @Transactional
     public FerramentaResponseDto update(Long id, FerramentaResponseDto dto) throws IdNaoEncontradoException {
         Fornecedor fornecedor = null;
-        Estoque estoque = null;
 
         if (dto.fornecedorId() != null) {
             fornecedor = fornecedorRepository.findById(dto.fornecedorId())
                     .orElseThrow(() -> new IdNaoEncontradoException("Fornecedor não encontrado"));
         }
 
-        if (dto.estoqueId() != null) {
-            estoque = estoqueRepository.findById(dto.estoqueId())
-                    .orElseThrow(() -> new IdNaoEncontradoException("Estoque não encontrado"));
-        }
 
         Ferramenta ferramenta = repository.findById(id)
                 .orElseThrow(() -> new IdNaoEncontradoException("Ferramenta não encontrada"));
 
         int novoQuantidade = dto.quantidade();
-        Long novoEstoqueId = dto.estoqueId();
 
-        if (novoEstoqueId != null) {
-            Estoque novoEstoque = estoqueRepository.findById(novoEstoqueId)
+        Estoque estoqueDestino = null;
+        if (dto.estoqueId() != null) {
+            estoqueDestino = estoqueRepository.findById(dto.estoqueId())
                     .orElseThrow(() -> new IdNaoEncontradoException("Estoque não encontrado"));
+        } else {
+            estoqueDestino = ferramenta.getEstoque();
+        }
 
-            validaQuantidade(ferramenta.getId(), ferramenta, novoQuantidade);
+        if (estoqueDestino != null) {
+            int usadoNoDestino = repository.findByEstoqueId(estoqueDestino.getId())
+                    .stream()
+                    .filter(f -> !f.getId().equals(ferramenta.getId()))
+                    .mapToInt(Ferramenta::getQuantidade)
+                    .sum();
 
+            if (usadoNoDestino + novoQuantidade > estoqueDestino.getCapacidade()) {
+                String msg = String.format(
+                        "Ultrapassou a capacidade do estoque no local '%s'. Capacidade: %d, já usado: %d, tentando adicionar: %d.",
+                        estoqueDestino.getLocalArmazenamento() == null ? "Não informado" : estoqueDestino.getLocalArmazenamento(),
+                        estoqueDestino.getCapacidade(),
+                        usadoNoDestino,
+                        novoQuantidade
+                );
+                throw new RuntimeException(msg);
+            }
 
-            ferramenta.setEstoque(novoEstoque);
+            ferramenta.setEstoque(estoqueDestino);
         }
 
         ferramenta.setNome(dto.nome());
@@ -178,7 +191,6 @@ public class FerramentaService {
     public void validaQuantidade(Long id, Ferramenta ferramenta, int quantidade){
         int capacidade = ferramenta.getEstoque().getCapacidade();
 
-        // soma todas as ferramentas do estoque (exceto a que está sendo alterada)
         int usedInTarget = repository.findByEstoqueId(ferramenta.getEstoque().getId())
                 .stream()
                 .filter(f -> !f.getId().equals(id))

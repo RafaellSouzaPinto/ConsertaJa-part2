@@ -22,10 +22,8 @@ public class FornecedorService {
     @Transactional
     public Fornecedor save(FornecedorRequestDto dto) {
 
-        // Cria fornecedor a partir do DTO
         Fornecedor fornecedor = new Fornecedor(dto);
 
-        // Formata campos
         if (dto.cnpj() != null) {
             fornecedor.setCnpj(FormatUtils.formatCnpj(dto.cnpj()));
         }
