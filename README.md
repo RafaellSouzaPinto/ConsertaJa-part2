@@ -155,7 +155,7 @@ pom.xml
 
 [![Deploy Online](https://img.shields.io/badge/🌍%20Abrir%20Aplicação-000?style=for-the-badge&logo=vercel)](https://consertaja-part2.onrender.com)  
 
-[![Vídeo de Demonstração](https://img.shields.io/badge/▶️%20Ver%20Demonstração-FF0000?style=for-the-badge&logo=youtube)](LINK_DO_VIDEO_AQUI)  
+[![Vídeo de Demonstração](https://img.shields.io/badge/▶️%20Ver%20Demonstração-FF0000?style=for-the-badge&logo=youtube)](https://youtu.be/067wtbeC9eE)  
 
 ---
 
